@@ -160,3 +160,4 @@ cython_debug/
 
 # Aws CDK
 cdk.out/*
+.env
