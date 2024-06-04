@@ -22,7 +22,7 @@ SOURCE_PRODUCER_PRIMARY_ONE = os.getenv("SOURCE_PRODUCER_PRIMARY_ONE")
 SOURCE_PRODUCER_PRIMARY_TWO = os.getenv("SOURCE_PRODUCER_PRIMARY_TWO")
 
 
-class EventsStackPrimaryRegion(cdk.Stack):
+class EventsStackPrimary(cdk.Stack):
     def __init__(self, scope: Construct, id: str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
@@ -47,9 +47,7 @@ class EventsStackPrimaryRegion(cdk.Stack):
         lambda_rule = iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
             actions=["events:PutEvents"],
-            resources=[
-                "arn:aws:events:*:*:event-bus/*"
-            ],  # [event_bus_primary.event_bus_arn],
+            resources=["arn:aws:events:*:*:event-bus/*"],  # [event_bus_primary.event_bus_arn],
         )
         lambda_producer_one.add_to_role_policy(lambda_rule)
         lambda_producer_two.add_to_role_policy(lambda_rule)
@@ -94,9 +92,7 @@ class EventsStackPrimaryRegion(cdk.Stack):
             event_pattern={"source": [SOURCE_PRODUCER_PRIMARY_ONE]},
         )
         rule_event_bus_secondary.add_target(
-            targets.EventBus(
-                event_bus_secondary, role=role_event_bus_primary_to_secondary
-            )
+            targets.EventBus(event_bus_secondary, role=role_event_bus_primary_to_secondary)
         )
 
         # Sqs queue as target for all events
@@ -115,9 +111,7 @@ class EventsStackPrimaryRegion(cdk.Stack):
             self,
             id="RuleSqs",
             event_bus=event_bus_primary,
-            event_pattern={
-                "source": [SOURCE_PRODUCER_PRIMARY_ONE, SOURCE_PRODUCER_PRIMARY_TWO]
-            },
+            event_pattern={"source": [SOURCE_PRODUCER_PRIMARY_ONE, SOURCE_PRODUCER_PRIMARY_TWO]},
             targets=[targets.SqsQueue(sqs_queue)],
         )
 

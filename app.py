@@ -1,7 +1,7 @@
 import aws_cdk as cdk
 import os
-from stacks.events_stack_primary_region import EventsStackPrimaryRegion
-from stacks.events_stack_secondary_region import EventsStackSecondaryRegion
+from stacks.events_stack_primary_region import EventsStackPrimary
+from stacks.events_stack_secondary_region import EventsStackSecondary
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,10 +13,8 @@ REGION_SECONDARY = os.getenv("REGION_SECONDARY")
 
 app = cdk.App()
 
-EventsStackPrimaryRegion(
-    app, "EventsStackPrimaryRegion", env=cdk.Environment(region=REGION_PRIMARY)
-)
-EventsStackSecondaryRegion(
+EventsStackPrimary(app, "EventsStackPrimaryRegion", env=cdk.Environment(region=REGION_PRIMARY))
+EventsStackSecondary(
     app,
     "EventsStackSecondaryRegion",
     env=cdk.Environment(region=REGION_SECONDARY),
