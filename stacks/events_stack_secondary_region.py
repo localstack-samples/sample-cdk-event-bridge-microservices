@@ -34,7 +34,7 @@ class EventsStackSecondaryRegion(cdk.Stack):
             id="Consumer",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="consumer.lambda_handler",
-            code=_lambda.Code.from_asset(os.path.join("./_lambda/")),
+            code=_lambda.Code.from_asset(os.path.join("./stacks/_lambda/")),
         )
 
         # Lambda consumer S3 bucket
@@ -56,12 +56,14 @@ class EventsStackSecondaryRegion(cdk.Stack):
             id="ProducerSecondary",
             runtime=_lambda.Runtime.PYTHON_3_11,
             handler="producer_secondary.lambda_handler",
-            code=_lambda.Code.from_asset(os.path.join("./_lambda/")),
+            code=_lambda.Code.from_asset(os.path.join("./stacks/_lambda/")),
         )
         lambda_rule = iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
             actions=["events:PutEvents"],
-            resources=["arn:aws:events:*:*:event-bus/*"],  # [event_bus_primary.event_bus_arn],
+            resources=[
+                "arn:aws:events:*:*:event-bus/*"
+            ],  # [event_bus_primary.event_bus_arn],
         )
         lambda_producer.add_to_role_policy(lambda_rule)
 

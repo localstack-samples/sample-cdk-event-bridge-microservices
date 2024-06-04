@@ -1,7 +1,7 @@
 import aws_cdk as cdk
 import os
-from events_stack_primary_region import EventsStackPrimaryRegion
-from events_stack_secondary_region import EventsStackSecondaryRegion
+from stacks.events_stack_primary_region import EventsStackPrimaryRegion
+from stacks.events_stack_secondary_region import EventsStackSecondaryRegion
 from dotenv import load_dotenv
 
 load_dotenv()
