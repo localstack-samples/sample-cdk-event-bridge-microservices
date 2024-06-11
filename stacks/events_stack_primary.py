@@ -16,7 +16,9 @@ load_dotenv()
 
 REGION_SECONDARY = os.getenv("REGION_SECONDARY")
 ACCOUNT_ID = os.getenv("ACCOUNT_ID")
-EVENT_BUS_NAME_SECONDARY = os.getenv("EVENT_BUS_NAME_SECONDARY")
+SECONDARY_ACCOUNT_ID = os.getenv("SECONDARY_ACCOUNT_ID")
+EVENT_BUS_NAME_SECONDARY_REGION = os.getenv("EVENT_BUS_NAME_SECONDARY_REGION")
+EVENT_BUS_NAME_SECONDARY_ACCOUNT = os.getenv("EVENT_BUS_NAME_SECONDARY_ACCOUNT")
 EVENT_BUS_NAME_PRIMARY = os.getenv("EVENT_BUS_NAME_PRIMARY")
 SOURCE_PRODUCER_PRIMARY_ONE = os.getenv("SOURCE_PRODUCER_PRIMARY_ONE")
 SOURCE_PRODUCER_PRIMARY_TWO = os.getenv("SOURCE_PRODUCER_PRIMARY_TWO")
@@ -53,13 +55,20 @@ class EventsStackPrimary(cdk.Stack):
         lambda_producer_two.add_to_role_policy(lambda_rule)
 
         # Define the event bus in the secondary region
-        event_bus_secondary = events.EventBus.from_event_bus_arn(
+        event_bus_secondary_region = events.EventBus.from_event_bus_arn(
             self,
             id="EventBusSecondary",
-            event_bus_arn=f"arn:aws:events:{REGION_SECONDARY}:{ACCOUNT_ID}:event-bus/{EVENT_BUS_NAME_SECONDARY}",
+            event_bus_arn=f"arn:aws:events:{REGION_SECONDARY}:{ACCOUNT_ID}:event-bus/{EVENT_BUS_NAME_SECONDARY_REGION}",
         )
 
-        # Role to put events from event bus 1 to event bus 2 in region secondary
+        # Define the event bus in the secondary account
+        event_bus_secondary_account = events.EventBus.from_event_bus_arn(
+            self,
+            id="EventBusSecondaryAccount",
+            event_bus_arn=f"arn:aws:events:{REGION_SECONDARY}:{SECONDARY_ACCOUNT_ID}:event-bus/{EVENT_BUS_NAME_SECONDARY_ACCOUNT}",
+        )
+
+        # Role to put events from event bus primary to event bus secondary region
         role_event_bus_primary_to_secondary = iam.Role(
             self,
             id="EventBusPrimaryToSecondaryRole",
@@ -72,19 +81,19 @@ class EventsStackPrimary(cdk.Stack):
                             effect=iam.Effect.ALLOW,
                             resources=[
                                 "arn:aws:events:*:*:event-bus/*"
-                            ],  # [event_bus_secondary.event_bus_arn],
+                            ],  # [event_bus_secondary_region.event_bus_arn],
                         )
                     ]
                 )
             },
         )
 
-        # Event bus 1 central bus in region main region
+        # Event bus primary in primary region
         event_bus_primary = events.EventBus(
             self, id="EventBusPrimary", event_bus_name=EVENT_BUS_NAME_PRIMARY
         )
 
-        # Rule to send events from producer 1 event bus 1 to event bus 2
+        # Rule to send events from producer 1 event bus primary to event bus secondary region and secondary account
         rule_event_bus_secondary = events.Rule(
             self,
             id="RuleEventBusSecondary",
@@ -92,7 +101,10 @@ class EventsStackPrimary(cdk.Stack):
             event_pattern={"source": [SOURCE_PRODUCER_PRIMARY_ONE]},
         )
         rule_event_bus_secondary.add_target(
-            targets.EventBus(event_bus_secondary, role=role_event_bus_primary_to_secondary)
+            targets.EventBus(event_bus_secondary_region, role=role_event_bus_primary_to_secondary)
+        )
+        rule_event_bus_secondary.add_target(
+            targets.EventBus(event_bus_secondary_account, role=role_event_bus_primary_to_secondary)
         )
 
         # Sqs queue as target for all events
@@ -106,7 +118,7 @@ class EventsStackPrimary(cdk.Stack):
             )
         )
 
-        # Rule to send all events from event bus 1 to sqs queue
+        # Rule to send all events from event bus primary to sqs queue
         rule_sqs_queue = events.Rule(
             self,
             id="RuleSqs",
