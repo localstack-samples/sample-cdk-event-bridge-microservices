@@ -15,8 +15,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 REGION_SECONDARY = os.getenv("REGION_SECONDARY")
+REGION_PRIMARY = os.getenv("REGION_PRIMARY")
 ACCOUNT_ID = os.getenv("ACCOUNT_ID")
-SECONDARY_ACCOUNT_ID = os.getenv("SECONDARY_ACCOUNT_ID")
+ACCOUNT_ID_SECONDARY = os.getenv("ACCOUNT_ID_SECONDARY")
 EVENT_BUS_NAME_SECONDARY_REGION = os.getenv("EVENT_BUS_NAME_SECONDARY_REGION")
 EVENT_BUS_NAME_SECONDARY_ACCOUNT = os.getenv("EVENT_BUS_NAME_SECONDARY_ACCOUNT")
 EVENT_BUS_NAME_PRIMARY = os.getenv("EVENT_BUS_NAME_PRIMARY")
@@ -65,7 +66,7 @@ class EventsStackPrimary(cdk.Stack):
         event_bus_secondary_account = events.EventBus.from_event_bus_arn(
             self,
             id="EventBusSecondaryAccount",
-            event_bus_arn=f"arn:aws:events:{REGION_SECONDARY}:{SECONDARY_ACCOUNT_ID}:event-bus/{EVENT_BUS_NAME_SECONDARY_ACCOUNT}",
+            event_bus_arn=f"arn:aws:events:{REGION_PRIMARY}:{ACCOUNT_ID_SECONDARY}:event-bus/{EVENT_BUS_NAME_SECONDARY_ACCOUNT}",
         )
 
         # Role to put events from event bus primary to event bus secondary region
