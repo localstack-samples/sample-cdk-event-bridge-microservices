@@ -18,14 +18,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
-EVENT_BUS_NAME_SECONDARY_REGION = os.getenv("EVENT_BUS_NAME_SECONDARY_REGION")
 SOURCE_PRODUCER_PRIMARY_ONE = os.getenv("SOURCE_PRODUCER_PRIMARY_ONE")
 SOURCE_PRODUCER_PRIMARY_TWO = os.getenv("SOURCE_PRODUCER_PRIMARY_TWO")
 SOURCE_PRODUCER_SECONDARY = os.getenv("SOURCE_PRODUCER_SECONDARY")
 
 
 class EventsStackSecondary(cdk.Stack):
-    def __init__(self, scope: Construct, id: str, **kwargs) -> None:
+    def __init__(
+        self, scope: Construct, id: str, event_bus_name: str, bucket_name: str, **kwargs
+    ) -> None:
         super().__init__(scope, id, **kwargs)
 
         # Consumer lambda microservice
@@ -41,7 +42,7 @@ class EventsStackSecondary(cdk.Stack):
         bucket_consumer = s3.Bucket(
             self,
             id="S3BucketConsumer",
-            bucket_name=S3_BUCKET_NAME,
+            bucket_name=bucket_name,
         )
         role_lambda_consumer_to_s3_bucket = iam.Role(
             self,
@@ -66,15 +67,15 @@ class EventsStackSecondary(cdk.Stack):
         lambda_producer.add_to_role_policy(lambda_rule)
 
         # Event bus 2 subscriber bus in region secondary
-        event_bus_secondary_region = events.EventBus(
-            self, id="EventBusSecondary", event_bus_name=EVENT_BUS_NAME_SECONDARY_REGION
+        event_bus_secondary = events.EventBus(
+            self, id="EventBusSecondary", event_bus_name=event_bus_name
         )
 
         # Event bridge rule to send events to the consumer lambda
         rule_lambda_consumer = events.Rule(
             self,
             "RuleLambdaConsumer",
-            event_bus=event_bus_secondary_region,
+            event_bus=event_bus_secondary,
             event_pattern={
                 "source": [SOURCE_PRODUCER_PRIMARY_ONE],
             },
@@ -95,7 +96,7 @@ class EventsStackSecondary(cdk.Stack):
         rule_sqs_queue = events.Rule(
             self,
             id="RuleSqs",
-            event_bus=event_bus_secondary_region,
+            event_bus=event_bus_secondary,
             event_pattern={
                 "source": [
                     SOURCE_PRODUCER_PRIMARY_ONE,
