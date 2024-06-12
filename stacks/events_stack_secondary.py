@@ -70,6 +70,14 @@ class EventsStackSecondary(cdk.Stack):
         event_bus_secondary = events.EventBus(
             self, id="EventBusSecondary", event_bus_name=event_bus_name
         )
+        events.CfnEventBusPolicy(
+            self,
+            id="EventBusPrimaryAccessPermission",
+            statement_id="AllowEventsFromPrimary",
+            event_bus_name=event_bus_secondary.event_bus_name,
+            action="events:PutEvents",
+            principal="*",
+        )
 
         # Event bridge rule to send events to the consumer lambda
         rule_lambda_consumer = events.Rule(
