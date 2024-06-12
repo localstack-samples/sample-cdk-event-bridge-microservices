@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timezone
 import json
 
-REGION_MAIN = "us-east-1"
+REGION_PRIMARY = "us-east-1"
 EVENT_BUS_NAME_PRIMARY = "event_bus_primary"
 SOURCE_PRODUCER_PRIMARY_ONE = "producer-primary-two"
 

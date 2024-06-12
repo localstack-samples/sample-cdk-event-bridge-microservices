@@ -18,8 +18,8 @@ REGION_SECONDARY = os.getenv("REGION_SECONDARY")
 REGION_PRIMARY = os.getenv("REGION_PRIMARY")
 ACCOUNT_ID = os.getenv("ACCOUNT_ID")
 ACCOUNT_ID_SECONDARY = os.getenv("ACCOUNT_ID_SECONDARY")
-EVENT_BUS_NAME_SECONDARY_REGION = os.getenv("EVENT_BUS_NAME_SECONDARY_REGION")
-EVENT_BUS_NAME_SECONDARY_ACCOUNT = os.getenv("EVENT_BUS_NAME_SECONDARY_ACCOUNT")
+EVENT_BUS_NAME_SECONDARY = os.getenv("EVENT_BUS_NAME_SECONDARY")
+EVENT_BUS_NAME_SECONDARY = os.getenv("EVENT_BUS_NAME_SECONDARY")
 EVENT_BUS_NAME_PRIMARY = os.getenv("EVENT_BUS_NAME_PRIMARY")
 SOURCE_PRODUCER_PRIMARY_ONE = os.getenv("SOURCE_PRODUCER_PRIMARY_ONE")
 SOURCE_PRODUCER_PRIMARY_TWO = os.getenv("SOURCE_PRODUCER_PRIMARY_TWO")
@@ -58,15 +58,15 @@ class EventsStackPrimary(cdk.Stack):
         # Define the event bus in the secondary region
         event_bus_secondary_region = events.EventBus.from_event_bus_arn(
             self,
-            id="EventBusSecondary",
-            event_bus_arn=f"arn:aws:events:{REGION_SECONDARY}:{ACCOUNT_ID}:event-bus/{EVENT_BUS_NAME_SECONDARY_REGION}",
+            id="EventBusSecondaryRegion",
+            event_bus_arn=f"arn:aws:events:{REGION_SECONDARY}:{ACCOUNT_ID}:event-bus/{EVENT_BUS_NAME_SECONDARY}",
         )
 
         # Define the event bus in the secondary account
         event_bus_secondary_account = events.EventBus.from_event_bus_arn(
             self,
             id="EventBusSecondaryAccount",
-            event_bus_arn=f"arn:aws:events:{REGION_PRIMARY}:{ACCOUNT_ID_SECONDARY}:event-bus/{EVENT_BUS_NAME_SECONDARY_ACCOUNT}",
+            event_bus_arn=f"arn:aws:events:{REGION_PRIMARY}:{ACCOUNT_ID_SECONDARY}:event-bus/{EVENT_BUS_NAME_SECONDARY}",
         )
 
         # Role to put events from event bus primary to event bus secondary region

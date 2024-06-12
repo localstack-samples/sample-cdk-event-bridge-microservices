@@ -3,7 +3,7 @@ import logging
 from datetime import datetime, timezone
 import json
 
-EVENT_BUS_NAME_SECONDARY_REGION = "event_bus_secondary_region"
+EVENT_BUS_NAME_SECONDARY = "event_bus_secondary"
 SOURCE_PRODUCER_SECONDARY = "producer-secondary"
 
 # Configure logging
@@ -17,7 +17,7 @@ events_client = boto3.client("events")
 def lambda_handler(event, context):
     entries = [
         {
-            "EventBusName": EVENT_BUS_NAME_SECONDARY_REGION,
+            "EventBusName": EVENT_BUS_NAME_SECONDARY,
             "Source": SOURCE_PRODUCER_SECONDARY,
             "DetailType": "update-account-command",
             "Detail": json.dumps(event),
