@@ -12,7 +12,8 @@ load_dotenv(os.path.join(BASEDIR, ".env"))
 
 ACCOUNT_ID = os.getenv("ACCOUNT_ID")
 ACCOUNT_ID_SECONDARY = os.getenv("ACCOUNT_ID_SECONDARY")
-ACCOUNT_PROFILE_NAME_SECONDARY = os.getenv("ACCOUNT_PROFILE_NAME_SECONDARY")
+AWS_ACCESS_KEY_ID_SECONDARY = os.getenv("AWS_ACCESS_KEY_ID_SECONDARY")
+AWS_SECRET_ACCESS_KEY_SECONDARY = os.getenv("AWS_SECRET_ACCESS_KEY_SECONDARY")
 
 ACCESS_KEY_SECONDARY = os.getenv("ACCESS_KEY_SECONDARY")
 SECRET_KEY_SECONDARY = os.getenv("SECRET_KEY_SECONDARY")
@@ -182,7 +183,8 @@ def test_cross_region():
 def test_cross_account():
     # Create boto3 clients for both accounts
     session_secondary_account = boto3.Session(
-        profile_name=ACCOUNT_PROFILE_NAME_SECONDARY,
+        aws_access_key_id=AWS_ACCESS_KEY_ID_SECONDARY,
+        aws_secret_access_key=AWS_SECRET_ACCESS_KEY_SECONDARY,
         region_name=REGION_PRIMARY,
     )
 
