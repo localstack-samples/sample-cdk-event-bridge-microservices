@@ -14,7 +14,7 @@ deploy-localstack:
 	@echo "Preparing deployment"
 	cdklocal bootstrap aws://000000000000/us-east-1
 	cdklocal bootstrap aws://000000000000/eu-central-1
-	cdklocal bootstrap aws://000000000001/us-east-1
+	AWS_ACCESS_KEY_ID=000000000001 AWS_SECRET_ACCESS_KEY=000000000001 cdklocal bootstrap aws://000000000001/us-east-1
 	cdklocal synth
 	@echo "Deploy event brdige microservice stack primary region/account"
 	cdklocal deploy EventsStackPrimary --require-approval never
@@ -22,6 +22,7 @@ deploy-localstack:
 	cdklocal deploy EventsStackSecondaryRegion --require-approval never
 	@echo "Deploy event brdige microservice stack secondary account"
 	cdklocal deploy EventsStackSecondaryAccount --require-approval never
+	AWS_ACCESS_KEY_ID=000000000001 AWS_SECRET_ACCESS_KEY=000000000001 cdklocal deploy EventsStackSecondaryAccount --require-approval never
 
 deploy-aws:
 	@echo "Preparing deployment"
