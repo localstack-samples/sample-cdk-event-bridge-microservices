@@ -21,6 +21,7 @@ deploy-localstack:
 	@echo "Deploy event brdige microservice stack secondary region/account"
 	cdklocal deploy EventsStackSecondaryRegion --require-approval never
 	@echo "Deploy event brdige microservice stack secondary account"
+	cdklocal deploy EventsStackSecondaryAccount --require-approval never
 
 deploy-aws:
 	@echo "Preparing deployment"
