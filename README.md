@@ -16,12 +16,13 @@ LocalStack sample CDK app deploying cross-region and cross-account EventBridge b
 # Prerequisites
 
 ## Required Software
+- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) to activate LocalStack.
 - Python 3.11
 - node >16
 - Docker
 - AWS CLI
 - AWS CDK
-- LocalStack CLI
+- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli)
 
 <details>
   <summary>if you are on Mac:</summary>
@@ -113,7 +114,9 @@ Against LocalStack
 - You need to bootstrap for the desired region and account each time you start LocalStack
 
 ```bash
-localstack start
+export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
+make start
+make ready
 cdklocal synth
 cdklocal bootstrap aws://000000000000/us-east-1
 cdklocal bootstrap aws://000000000000/eu-central-1

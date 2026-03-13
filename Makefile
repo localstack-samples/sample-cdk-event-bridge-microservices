@@ -1,4 +1,9 @@
-.PHONY: deploy-localstack deploy-aws
+export AWS_ACCESS_KEY_ID ?= test
+export AWS_SECRET_ACCESS_KEY ?= test
+export AWS_DEFAULT_REGION=us-east-1
+SHELL := /bin/bash
+
+.PHONY: deploy-localstack deploy-aws start stop ready logs
 
 list-resources-localstack:
 	@echo "List resources"
@@ -6,6 +11,20 @@ list-resources-localstack:
 	awslocal kinesis list-streams
 	awslocal firehose list-delivery-streams
 	awslocal redshift describe-clusters
+
+start:		## Start LocalStack
+	@test -n "${LOCALSTACK_AUTH_TOKEN}" || (echo "LOCALSTACK_AUTH_TOKEN is not set. Find your token at https://app.localstack.cloud/workspace/auth-token"; exit 1)
+	@LOCALSTACK_AUTH_TOKEN=$(LOCALSTACK_AUTH_TOKEN) localstack start -d
+
+stop:		## Stop LocalStack
+	@localstack stop
+
+ready:		## Wait until LocalStack is ready
+	@echo Waiting on the LocalStack container...
+	@localstack wait -t 30 && echo LocalStack is ready to use! || (echo Gave up waiting on LocalStack, exiting. && exit 1)
+
+logs:		## Save the logs in a separate file
+	@localstack logs > logs.txt
 
 start-localstack:
 	@docker ps -f "name=localstack" | grep localstack > /dev/null || (echo "Starting localstack..." && localstack start)
