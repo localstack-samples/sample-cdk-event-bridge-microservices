@@ -3,44 +3,40 @@ export AWS_SECRET_ACCESS_KEY ?= test
 export AWS_DEFAULT_REGION=us-east-1
 SHELL := /bin/bash
 
-.PHONY: deploy-localstack deploy-aws start stop ready logs
+.PHONY: deploy-localstack deploy-aws start stop logs
 
 list-resources-localstack:
 	@echo "List resources"
-	awslocal s3 ls
-	awslocal kinesis list-streams
-	awslocal firehose list-delivery-streams
-	awslocal redshift describe-clusters
+	lstk aws s3 ls
+	lstk aws kinesis list-streams
+	lstk aws firehose list-delivery-streams
+	lstk aws redshift describe-clusters
 
 start:		## Start LocalStack
 	@test -n "${LOCALSTACK_AUTH_TOKEN}" || (echo "LOCALSTACK_AUTH_TOKEN is not set. Find your token at https://app.localstack.cloud/workspace/auth-token"; exit 1)
-	@LOCALSTACK_AUTH_TOKEN=$(LOCALSTACK_AUTH_TOKEN) localstack start -d
+	@LOCALSTACK_AUTH_TOKEN=$(LOCALSTACK_AUTH_TOKEN) lstk start
 
 stop:		## Stop LocalStack
-	@localstack stop
-
-ready:		## Wait until LocalStack is ready
-	@echo Waiting on the LocalStack container...
-	@localstack wait -t 30 && echo LocalStack is ready to use! || (echo Gave up waiting on LocalStack, exiting. && exit 1)
+	@lstk stop
 
 logs:		## Save the logs in a separate file
-	@localstack logs > logs.txt
+	@lstk logs > logs.txt
 
 start-localstack:
-	@docker ps -f "name=localstack" | grep localstack > /dev/null || (echo "Starting localstack..." && localstack start)
+	@docker ps -f "name=localstack" | grep localstack > /dev/null || (echo "Starting localstack..." && lstk start)
 
 deploy-localstack:
 	@echo "Preparing deployment"
-	cdklocal bootstrap aws://000000000000/us-east-1
-	cdklocal bootstrap aws://000000000000/eu-central-1
-	cdklocal bootstrap aws://000000000001/us-east-1
-	cdklocal synth
+	lstk cdk bootstrap aws://000000000000/us-east-1
+	lstk cdk bootstrap aws://000000000000/eu-central-1
+	lstk cdk bootstrap aws://000000000001/us-east-1
+	lstk cdk synth
 	@echo "Deploy event brdige microservice stack primary region/account"
-	cdklocal deploy EventsStackPrimary --require-approval never
+	lstk cdk deploy EventsStackPrimary --require-approval never
 	@echo "Deploy event brdige microservice stack secondary region/account"
-	cdklocal deploy EventsStackSecondaryRegion --require-approval never
+	lstk cdk deploy EventsStackSecondaryRegion --require-approval never
 	@echo "Deploy event brdige microservice stack secondary account"
-	cdklocal deploy EventsStackSecondaryAccount --require-approval never
+	lstk cdk deploy EventsStackSecondaryAccount --require-approval never
 
 deploy-aws:
 	@echo "Preparing deployment"
