@@ -23,9 +23,6 @@ importlib_resources==6.4.0
 iniconfig==2.0.0
 jmespath==1.0.1
 jsii==1.99.0
-localstack==3.4.0
-localstack-core==3.4.0
-localstack-ext==3.4.0
 markdown-it-py==3.0.0
 mdurl==0.1.2
 packaging==24.0

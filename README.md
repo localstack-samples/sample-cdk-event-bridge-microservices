@@ -16,13 +16,13 @@ LocalStack sample CDK app deploying cross-region and cross-account EventBridge b
 # Prerequisites
 
 ## Required Software
-- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/getting-started/auth-token/) to activate LocalStack.
+- A valid [LocalStack for AWS license](https://localstack.cloud/pricing). Your license provides a [`LOCALSTACK_AUTH_TOKEN`](https://docs.localstack.cloud/aws/getting-started/auth-token/) to activate LocalStack.
 - Python 3.11
 - node >16
 - Docker
-- AWS CLI
+- AWS CLI, required by `lstk aws`
 - AWS CDK
-- [`localstack` CLI](https://docs.localstack.cloud/getting-started/installation/#localstack-cli)
+- [`lstk` CLI](https://docs.localstack.cloud/aws/developer-tools/running-localstack/lstk/)
 
 <details>
   <summary>if you are on Mac:</summary>
@@ -54,11 +54,10 @@ LocalStack sample CDK app deploying cross-region and cross-account EventBridge b
         npm install -g aws-cdk
         ```
 
-    5. install localstack-cli and cdklocal
+    5. install lstk
         
         ```bash
-        brew install localstack/tap/localstack-cli
-        npm install -g aws-cdk-local
+        brew install localstack/tap/lstk
         ```
 </details>
 
@@ -116,14 +115,13 @@ Against LocalStack
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 make start
-make ready
-cdklocal synth
-cdklocal bootstrap aws://000000000000/us-east-1
-cdklocal bootstrap aws://000000000000/eu-central-1
-cdklocal bootstrap aws://000000000001/us-east-1
-cdklocal deploy EventsStackPrimary --require-approval never
-cdklocal deploy EventsStackSecondaryRegion --require-approval never
-cdklocal deploy EventsStackSecondaryAccount --require-approval never
+lstk cdk synth
+lstk cdk bootstrap aws://000000000000/us-east-1
+lstk cdk bootstrap aws://000000000000/eu-central-1
+lstk cdk bootstrap aws://000000000001/us-east-1
+lstk cdk deploy EventsStackPrimary --require-approval never
+lstk cdk deploy EventsStackSecondaryRegion --require-approval never
+lstk cdk deploy EventsStackSecondaryAccount --require-approval never
 ```
 
 
