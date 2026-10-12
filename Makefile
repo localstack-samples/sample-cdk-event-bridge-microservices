@@ -3,7 +3,18 @@ export AWS_SECRET_ACCESS_KEY ?= test
 export AWS_DEFAULT_REGION=us-east-1
 SHELL := /bin/bash
 
-.PHONY: deploy-localstack deploy-aws start stop logs
+.PHONY: install configure-localstack-profile deploy-localstack deploy-aws start stop logs test
+
+install:	## Install dependencies and create the .env files
+	@which lstk || npm install -g @localstack/lstk aws-cdk
+	pip install -r requirements.txt
+	@test -e .env || cp .env.example .env
+	@test -e tests/.env || cp .env.example tests/.env
+
+configure-localstack-profile:	## Create the "secondary" AWS profile for the second LocalStack account
+	aws configure set aws_access_key_id 000000000001 --profile secondary
+	aws configure set aws_secret_access_key test --profile secondary
+	aws configure set region us-east-1 --profile secondary
 
 list-resources-localstack:
 	@echo "List resources"
@@ -29,14 +40,14 @@ deploy-localstack:
 	@echo "Preparing deployment"
 	lstk cdk bootstrap aws://000000000000/us-east-1
 	lstk cdk bootstrap aws://000000000000/eu-central-1
-	lstk cdk bootstrap aws://000000000001/us-east-1
+	lstk cdk bootstrap aws://000000000001/us-east-1 --profile secondary
 	lstk cdk synth
 	@echo "Deploy event brdige microservice stack primary region/account"
 	lstk cdk deploy EventsStackPrimary --require-approval never
 	@echo "Deploy event brdige microservice stack secondary region/account"
 	lstk cdk deploy EventsStackSecondaryRegion --require-approval never
 	@echo "Deploy event brdige microservice stack secondary account"
-	lstk cdk deploy EventsStackSecondaryAccount --require-approval never
+	lstk cdk deploy EventsStackSecondaryAccount --require-approval never --profile secondary
 
 deploy-aws:
 	@echo "Preparing deployment"

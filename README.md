@@ -111,17 +111,19 @@ Against LocalStack
 
 - use the Makefile command `deploy-localstack` or run the following commands manually
 - You need to bootstrap for the desired region and account each time you start LocalStack
+- The second account (`000000000001`) is reached through a `secondary` AWS profile. `make configure-localstack-profile` creates it.
 
 ```bash
 export LOCALSTACK_AUTH_TOKEN=<your-auth-token>
 make start
+make configure-localstack-profile
 lstk cdk synth
 lstk cdk bootstrap aws://000000000000/us-east-1
 lstk cdk bootstrap aws://000000000000/eu-central-1
-lstk cdk bootstrap aws://000000000001/us-east-1
+lstk cdk bootstrap aws://000000000001/us-east-1 --profile secondary
 lstk cdk deploy EventsStackPrimary --require-approval never
 lstk cdk deploy EventsStackSecondaryRegion --require-approval never
-lstk cdk deploy EventsStackSecondaryAccount --require-approval never
+lstk cdk deploy EventsStackSecondaryAccount --require-approval never --profile secondary
 ```
 
 
@@ -129,6 +131,13 @@ lstk cdk deploy EventsStackSecondaryAccount --require-approval never
 
 ## Run the tests either against AWS or LocalStack
 ```bash
+make test
+```
+
+Against LocalStack, point the AWS SDK at the emulator first:
+
+```bash
+export AWS_ENDPOINT_URL=http://localhost.localstack.cloud:4566
 make test
 ```
 
